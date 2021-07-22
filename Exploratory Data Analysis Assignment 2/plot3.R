@@ -1,0 +1,17 @@
+NEI <- readRDS("summarySCC_PM25.rds")
+SCC <- readRDS("Source_Classification_Code.rds")
+library(dplyr)
+library(ggplot2)
+NEI_Bal <- NEI %>% filter(fips == "24510")
+NEI_Bal_year.type <- NEI_Bal %>% group_by(year,type) 
+total_emissions_Bal_year.type <- summarise(NEI_Bal_year.type, emissions_Bal_sum = sum(Emissions))
+png("plot3.png",width=960,height=480)
+x3 <- ggplot(total_emissions_Bal_year.type, aes(x=factor(year),y=emissions_Bal_sum, fill= type))
+x3 <- x3 + geom_bar(stat="identity") + facet_grid(.~type)
+x3 <- x3 + xlab("year") + ylab(expression("total PM"[2.5]*" emission"))
+x3 <- x3 + ggtitle(expression("Total PM"[2.5]*" emission of different types in Baltimore"))
+x3 <- x3 + theme(plot.title = element_text(hjust=0.5))  
+x3 <- x3 + geom_text(aes(label = round(emissions_Bal_sum,2),vjust=-0.7,hjust=0.5))
+x3
+dev.off()
+
